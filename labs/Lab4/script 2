@@ -1,0 +1,8 @@
+# WRITE A SCRIPT (2 of 2)
+# Like the bash script you wrote above, now write a simple Python script that performs a similar task. Your script should:
+# - Fetch and save a file from the internet using urllib, requests or some other simple method. A simple gif would be a good file to work with, but your code should pull the file, not a human manually saving it.
+# - Upload the file to a bucket in S3.
+# - Presign the file with an expiration time. Documentation for that method is here
+# - Output the presigned URL.
+# - Test your script and be sure it works without error.
+# - BONUS: If you'd like to learn a new skill, try using the argparse library to customize command-line arguments with a Python script.
