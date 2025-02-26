@@ -1,1 +1,6 @@
+# WRITE A SCRIPT (1 of 2) - Write a simple bash script that performs two actions:
+# 1. Uploads a file (image, PDF, etc.) to a private bucket.
+# 2. Presigns a URL to that file with an expiration of 604800 (7 days).
+# 3. Write the script so that it takes three positional arguments: The name of the local file to upload, the name of the bucket in your account, and the length of expiration in seconds.
+
 
