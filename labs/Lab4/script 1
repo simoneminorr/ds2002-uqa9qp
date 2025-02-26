@@ -3,4 +3,24 @@
 # 2. Presigns a URL to that file with an expiration of 604800 (7 days).
 # 3. Write the script so that it takes three positional arguments: The name of the local file to upload, the name of the bucket in your account, and the length of expiration in seconds.
 
+#!/bin/bash
 
+aws s3 mb s3://ds2002-uqa9qp
+curl https://meanderingwild.com/wp-content/uploads/2023/04/sunflower-personality.jpeg > sunflower.jpeg
+aws s3 cp sunflower.jpeg s3://ds2002-uqa9qp/
+aws s3 ls s3://ds2002-mst3k/
+https://s3.amazonaws.com/ds2002-uqa9qp/sunflower.jpeg
+aws s3 presign --expires-in 604800 s3://ds2002-uqa9qp/sunflower.jpg
+
+if [ "$#" -ne 3 ]; then
+        echo "Incorrect Number of Inputs"
+        exit 1
+
+file_to_upload="$1"
+bucket="$2"
+expiration_secs="$3"
+
+curl https://meanderingwild.com/wp-content/uploads/2023/04/sunflower-personality.jpeg > sunflower.jpeg
+aws s3 cp $file_to_upload s3://$bucket/
+https://s3.amazonaws.com/$bucket/$file_to_upload
+aws s3 presign --expires-in 604800 s3://ds2002-uqa9qp/sunflower.jpg
