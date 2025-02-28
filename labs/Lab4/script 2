@@ -1,23 +1,18 @@
-# WRITE A SCRIPT (2 of 2)
-# Like the bash script you wrote above, now write a simple Python script that performs a similar task. Your script should:
-# - Fetch and save a file from the internet using urllib, requests or some other simple method. A simple gif would be a good file to work with, but your code should pull the file, not a human manually saving it.
-# - Upload the file to a bucket in S3.
-# - Presign the file with an expiration time. Documentation for that method is here
-# - Output the presigned URL.
-# - Test your script and be sure it works without error.
-# - BONUS: If you'd like to learn a new skill, try using the argparse library to customize command-line arguments with a Python script.
 
 import boto3
 from botocore.exceptions import ClientError
 import os
 import sys
 import requests
+from urllib.parse import urlparse
 
 def upload_file(GIF_URL, BUCKET, object_name=None):
         response = requests.get(GIF_URL, stream=True)
 
 def download_file(GIF_URL, BUCKET, EXPIRES):
-        path = os.path.join(os.getcwd(), "downloaded.gif")
+        parsed_url= urlparse(GIF_URL)
+        file_name= os.path.basename(parsed_url.path)
+        path = os.path.join(os.getcwd(), file_name)
         response = requests.get(GIF_URL, stream=True)
         response.raise_for_status()
         with open(path, 'wb') as file:
@@ -29,12 +24,12 @@ def download_file(GIF_URL, BUCKET, EXPIRES):
                 ACL = 'public-read',
                 Body = path,
                 Bucket = BUCKET,
-                Key = path
+                Key = file_name
         )
 
         response = s3_client.generate_presigned_url(
                 'get_object',
-                Params={'Bucket': BUCKET, 'Key': path},
+                Params={'Bucket': BUCKET, 'Key': file_name},
                 ExpiresIn= EXPIRES
         )
 
@@ -46,5 +41,5 @@ if __name__=="__main__":
         EXPIRES= sys.argv[3]
         download_file(GIF_URL, BUCKET, EXPIRES)
 
-Final Input: python3 lab4.script2.py https://s.yimg.com/ny/api/res/1.2/nITV.ukee6aggZzc0jasiQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTY0MA--/https://s.yimg.com/os/creatr-uploaded-images/2023-06/dfe6ff10-19ca-11ee-8d5b-8f954b8ec342
 
+Final Input: python3 lab4.script2.py "https://media.gettyimages.com/id/175530592/photo/making-raspberry-jam.jpg?s=612x612&w=gi&k=20&c=tYUyHWRmKmiQQYMWHqzye5hyWPvTLf2P59i1gU5JqII=" ds2002-uqa9qp 100
