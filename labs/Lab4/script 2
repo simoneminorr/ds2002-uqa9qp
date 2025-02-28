@@ -6,3 +6,58 @@
 # - Output the presigned URL.
 # - Test your script and be sure it works without error.
 # - BONUS: If you'd like to learn a new skill, try using the argparse library to customize command-line arguments with a Python script.
+
+import logging
+import boto3
+from botocore.exceptions import ClientError
+import os
+
+def upload_file(FILE_NAME, BUCKET, object_name=None):
+
+GIF_URL= "https://s.yimg.com/ny/api/res/1.2/nITV.ukee6aggZzc0jasiQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTY0MA--/https://s.yimg.com/os/creatr-uploaded-images/2023-06/dfe6ff10-19ca-11ee-8d5b-8f954b8ec342"
+FILE_NAME= "uploaded_gif"
+BUCKET = "ds2002-uqa9qp"
+EXPIRATION =3600
+
+#Dowload file using requests
+response = requests.get(GIF_URL, stream=True)
+
+  # If S3 object_name was not specified, use file_name
+    if object_name is None:
+        object_name = os.path.basename(file_name)
+
+    # Upload the file
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.upload_file(FILE_NAME, BUCKET, FILE_NAME)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+print(f"File uploaded to S3: s3/ds2002-uqa9qp")
+aws s3 presign --expires-in 60 s3://ds2002-uqa9qp/FILE_NAME
+
+
+def upload_file(file_name, bucket, object_name=None):
+    """Upload a file to an S3 bucket
+
+    :param file_name: File to upload
+    :param bucket: Bucket to upload to
+    :param object_name: S3 object name. If not specified then file_name is used
+    :return: True if file was uploaded, else False
+    """
+
+    # If S3 object_name was not specified, use file_name
+    if object_name is None:
+        object_name = os.path.basename(file_name)
+
+    # Upload the file
+    s3_client = boto3.client('s3')
+    try:
+        response = s3_client.upload_file(FILE_NAME, BUCKET, FILE_NAME)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
+aws s3 presign --expires-in 60 s3://ds2002-uqa9qp/sunflower.jpg
