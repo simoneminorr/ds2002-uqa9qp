@@ -7,57 +7,44 @@
 # - Test your script and be sure it works without error.
 # - BONUS: If you'd like to learn a new skill, try using the argparse library to customize command-line arguments with a Python script.
 
-import logging
 import boto3
 from botocore.exceptions import ClientError
 import os
+import sys
+import requests
 
-def upload_file(FILE_NAME, BUCKET, object_name=None):
+def upload_file(GIF_URL, BUCKET, object_name=None):
+        response = requests.get(GIF_URL, stream=True)
 
-GIF_URL= "https://s.yimg.com/ny/api/res/1.2/nITV.ukee6aggZzc0jasiQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTY0MA--/https://s.yimg.com/os/creatr-uploaded-images/2023-06/dfe6ff10-19ca-11ee-8d5b-8f954b8ec342"
-FILE_NAME= "uploaded_gif"
-BUCKET = "ds2002-uqa9qp"
-EXPIRATION =3600
+def download_file(GIF_URL, BUCKET, EXPIRES):
+        path = os.path.join(os.getcwd(), "downloaded.gif")
+        response = requests.get(GIF_URL, stream=True)
+        response.raise_for_status()
+        with open(path, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
 
-#Dowload file using requests
-response = requests.get(GIF_URL, stream=True)
+        s3_client = boto3.client('s3', region_name="us-east-1")
+        resp = s3_client.put_object(
+                ACL = 'public-read',
+                Body = path,
+                Bucket = BUCKET,
+                Key = path
+        )
 
-  # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = os.path.basename(file_name)
+        response = s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': BUCKET, 'Key': path},
+                ExpiresIn= EXPIRES
+        )
 
-    # Upload the file
-    s3_client = boto3.client('s3')
-    try:
-        response = s3_client.upload_file(FILE_NAME, BUCKET, FILE_NAME)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
-print(f"File uploaded to S3: s3/ds2002-uqa9qp")
-aws s3 presign --expires-in 60 s3://ds2002-uqa9qp/FILE_NAME
+        print(response)
 
+if __name__=="__main__":
+        GIF_URL= sys.argv[1]
+        BUCKET= sys.argv[2]
+        EXPIRES= sys.argv[3]
+        download_file(GIF_URL, BUCKET, EXPIRES)
 
-def upload_file(file_name, bucket, object_name=None):
-    """Upload a file to an S3 bucket
+Final Input: python3 lab4.script2.py https://s.yimg.com/ny/api/res/1.2/nITV.ukee6aggZzc0jasiQ--/YXBwaWQ9aGlnaGxhbmRlcjt3PTY0MDtoPTY0MA--/https://s.yimg.com/os/creatr-uploaded-images/2023-06/dfe6ff10-19ca-11ee-8d5b-8f954b8ec342
 
-    :param file_name: File to upload
-    :param bucket: Bucket to upload to
-    :param object_name: S3 object name. If not specified then file_name is used
-    :return: True if file was uploaded, else False
-    """
-
-    # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = os.path.basename(file_name)
-
-    # Upload the file
-    s3_client = boto3.client('s3')
-    try:
-        response = s3_client.upload_file(FILE_NAME, BUCKET, FILE_NAME)
-    except ClientError as e:
-        logging.error(e)
-        return False
-    return True
-
-aws s3 presign --expires-in 60 s3://ds2002-uqa9qp/sunflower.jpg
