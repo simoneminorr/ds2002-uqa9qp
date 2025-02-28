@@ -17,3 +17,5 @@ expiration_secs="$3"
 
 aws s3 cp $file_to_upload s3://$bucket/
 aws s3 presign --expires-in $expiration_secs s3://$bucket/$file_to_upload
+
+# Final Input: ./lab4_script1.sh sunflower.jpeg ds2002-uqa9qp 604800
